@@ -14,17 +14,24 @@ const SHOPIFY_TOKEN = import.meta.env.VITE_SHOPIFY_PUBLIC_ACCESS_TOKEN || 'f41ed
 function initShopify() {
   const container = document.getElementById('shopify-store-container');
   if (container) {
+    // Ensure the container is empty first
+    container.innerHTML = '';
+    
     // Create the store element dynamically
     const storeEl = document.createElement('shopify-store');
     storeEl.id = 'main-store';
-    storeEl.setAttribute('store-domain', SHOPIFY_DOMAIN);
-    storeEl.setAttribute('public-access-token', SHOPIFY_TOKEN);
+    
+    // Use synchronous config if available, fallback to environment or hardcoded
+    const domain = window.SHOPIFY_CONFIG?.domain || SHOPIFY_DOMAIN;
+    const token = window.SHOPIFY_CONFIG?.token || SHOPIFY_TOKEN;
+    
+    storeEl.setAttribute('store-domain', domain);
+    storeEl.setAttribute('public-access-token', token);
     storeEl.setAttribute('country', 'IN');
     storeEl.setAttribute('language', 'en');
     
-    // Append to DOM - this triggers connectedCallback with attributes already set
     container.appendChild(storeEl);
-    console.log('[SHOPIFY] Dynamic Store Injected:', SHOPIFY_DOMAIN);
+    console.log('[SHOPIFY] Dynamic Store Injected:', domain);
   }
 }
 initShopify();
@@ -164,45 +171,72 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ==================== APPOINTMENT FORM ====================
-const appointmentForm = document.getElementById('appointment-form');
-const timeSlots = document.querySelectorAll('.time-slot.free');
+// ==================== INTERACTIVE BOOKING SYSTEM ====================
+const BOOKING_KEY = 'dentora_bookings';
+let bookings = JSON.parse(localStorage.getItem(BOOKING_KEY) || '[]');
 
-if (timeSlots.length > 0) {
-  timeSlots.forEach(slot => {
+function initBooking() {
+  const slots = document.querySelectorAll('.time-slot');
+  if (slots.length === 0) return;
+
+  // Render initial states
+  renderSlots();
+
+  slots.forEach(slot => {
     slot.addEventListener('click', () => {
-      timeSlots.forEach(s => s.classList.remove('selected'));
+      if (slot.classList.contains('booked')) {
+        showToast('This slot is already booked.');
+        return;
+      }
+      slots.forEach(s => s.classList.remove('selected'));
       slot.classList.add('selected');
     });
   });
+
+  const form = document.getElementById('appointment-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const selectedSlot = document.querySelector('.time-slot.selected');
+      if (!selectedSlot) {
+        showToast('Please select a time slot.');
+        return;
+      }
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+      
+      // Save booking
+      const newBooking = {
+        time: selectedSlot.textContent,
+        date: data.date,
+        name: data.name
+      };
+      bookings.push(newBooking);
+      localStorage.setItem(BOOKING_KEY, JSON.stringify(bookings));
+
+      // Show success
+      document.querySelector('.success-overlay').classList.add('show');
+      renderSlots();
+      form.reset();
+    });
+  }
 }
 
-if (appointmentForm) {
-  appointmentForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(appointmentForm);
-    const data = Object.fromEntries(formData);
-    const selectedSlot = document.querySelector('.time-slot.selected');
-
-    if (!data.name || !data.email || !data.phone || !data.date || !data.service) {
-      showToast('Please fill in all required fields');
-      return;
-    }
-
-    if (!selectedSlot) {
-      showToast('Please select an available time slot.');
-      return;
-    }
-
-    // Show success overlay
-    document.querySelector('.success-overlay').classList.add('show');
-    appointmentForm.reset();
-    timeSlots.forEach(s => s.classList.remove('selected'));
-    
-    // Log the trigger for potential backend integration
-    console.log(`[BOOKING] Confirmed for ${data.name} on ${data.date} at ${selectedSlot.textContent}`);
+function renderSlots() {
+  const slots = document.querySelectorAll('.time-slot');
+  const currentDate = document.getElementById('appointment-date')?.value;
+  
+  slots.forEach(slot => {
+    const isBooked = bookings.some(b => b.time === slot.textContent && b.date === currentDate);
+    slot.classList.toggle('booked', isBooked);
+    slot.classList.remove('selected');
   });
 }
+
+// Re-render when date changes
+document.getElementById('appointment-date')?.addEventListener('change', renderSlots);
+initBooking();
 
 const successClose = document.getElementById('success-close');
 if (successClose) {
@@ -382,12 +416,16 @@ function init3D() {
     const time = Date.now() * 0.001;
 
     // Gentle float
-    modelGroup.position.y = Math.sin(time * 0.8) * 0.1;
+    modelGroup.position.y = Math.sin(time * 0.8) * 0.15;
     
+    // Breathing scale effect for the tooth
+    const scale = 1 + Math.sin(time * 1.5) * 0.02;
+    toothGroup.scale.set(scale, scale, scale);
+
     // Smooth interaction rotation
-    modelGroup.rotation.y += 0.005; // Constant slow spin
-    modelGroup.rotation.x += (mouseY * 0.2 - modelGroup.rotation.x) * 0.05;
-    modelGroup.rotation.y += (mouseX * 0.2 - modelGroup.rotation.y) * 0.05;
+    modelGroup.rotation.y += 0.003; // Constant slow spin
+    modelGroup.rotation.x += (mouseY * 0.25 - modelGroup.rotation.x) * 0.04;
+    modelGroup.rotation.y += (mouseX * 0.25 - modelGroup.rotation.y) * 0.04;
     
     renderer.render(scene, camera);
   }

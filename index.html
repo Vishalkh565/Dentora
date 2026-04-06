@@ -9,6 +9,13 @@
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <!-- Shopify Storefront SDK -->
   <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+  <script>
+    // Synchronous config to prevent context errors
+    window.SHOPIFY_CONFIG = {
+      domain: 'dentoraclinic.myshopify.com',
+      token: 'f41ed97311b7ca020be1dac2dc6a8bf9'
+    };
+  </script>
 </head>
 <body>
 

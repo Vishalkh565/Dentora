@@ -339,15 +339,21 @@ section { padding:120px 60px; position:relative; }
 .doctor-info p { color:rgba(255,255,255,0.6); font-size:0.88rem; }
 
 /* PRODUCTS */
-#shop { background:var(--bg-white); }
-.products-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; max-width:1200px; margin:0 auto; }
-.products-grid.four-col { grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width:1400px; }
-.products-grid.four-col .product-img { height: 260px; }
-.products-grid.four-col .product-info h3 { font-size: 1.2rem; }
-.products-grid.four-col .product-info p { font-size: 0.85rem; }
+#shop { background:var(--bg-white); padding: 120px 5%; }
+.products-grid { 
+  display:grid; 
+  grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); 
+  gap:40px; 
+  max-width:1400px; 
+  margin:0 auto; 
+  align-items: stretch; /* Force equal height children */
+}
 .product-card {
   background:var(--bg-cream); border:1px solid var(--border-light); border-radius:var(--radius);
   overflow:hidden; transition:var(--transition); position:relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .product-card.cinematic {
   background: transparent;
@@ -375,10 +381,10 @@ section { padding:120px 60px; position:relative; }
 .product-card.cinematic:nth-child(3) .product-img { animation-delay: 3s; }
 .product-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s cubic-bezier(0.16,1,0.3,1); }
 .product-card:hover .product-img img { transform:scale(1.05); }
-.product-info { padding:24px 8px; background:transparent; }
+.product-info { padding:24px 8px; background:transparent; flex-grow: 1; display: flex; flex-direction: column; }
 .product-info .brand { color:var(--primary); font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
-.product-info h3 { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; margin-bottom:8px; color:var(--text-dark); }
-.product-info p { color:var(--text-body); font-size:0.95rem; margin-bottom:20px; line-height: 1.6; }
+.product-info h3 { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; margin-bottom:8px; color:var(--text-dark); flex-shrink: 0; }
+.product-info p { color:var(--text-body); font-size:0.95rem; margin-bottom:20px; line-height: 1.6; flex-grow: 1; }
 .product-bottom { display:flex; align-items:center; justify-content:space-between; }
 .product-price { font-size:1.3rem; font-weight:700; color:var(--text-dark); }
 .product-price .old { text-decoration:line-through; color:var(--text-light); font-size:0.88rem; font-weight:400; margin-left:8px; }
@@ -473,8 +479,8 @@ section { padding:120px 60px; position:relative; }
   background: rgba(46, 204, 113, 0.2); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
 }
 .time-slot.booked {
-  background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
-  cursor: not-allowed;
+  background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3);
+  cursor: not-allowed; text-decoration: line-through; pointer-events: none;
 }
 .time-slot.selected {
   background: var(--accent); color: var(--bg-dark-brown); border: 1px solid var(--accent);
