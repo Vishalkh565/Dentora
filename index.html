@@ -29,15 +29,6 @@
 <div class="cursor-dot"></div>
 <div class="cursor-ring"></div>
 
-<!-- Shopify Store (Hardcoded for immediate SDK detection) -->
-<shopify-store 
-  id="main-store" 
-  store-domain="dentoraclinic.myshopify.com" 
-  public-access-token="f41ed97311b7ca020be1dac2dc6a8bf9"
-  country="IN" 
-  language="en">
-</shopify-store>
-
 <!-- Floating Particles -->
 <div class="particles"></div>
 
@@ -214,143 +205,146 @@
   </div>
 </section>
 
-<!-- Shop -->
-<section id="shop">
-  <div class="section-header">
-    <div class="section-tag reveal">DentOra Shop</div>
-    <h2 class="reveal">Premium <span>Oral Care</span> Products</h2>
-    <p class="reveal">Clinically tested, dentist-recommended products by DentOra for your daily oral care routine.</p>
-  </div>
-  <div class="products-grid four-col">
-    <!-- Row 1: Cinematic Essentials -->
-    <shopify-context type="product" handle="prowhite-whitening-kit">
-      <template>
-        <div class="product-card cinematic reveal">
-          <div class="product-badge">Bestseller</div>
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+<!-- Shop (Wrapped in Context for Bulletproof Linking) -->
+<shopify-store 
+  id="main-store" 
+  store-domain="dentoraclinic.myshopify.com" 
+  public-access-token="f41ed97311b7ca020be1dac2dc6a8bf9"
+  country="IN" 
+  language="en">
+  <section id="shop">
+    <div class="section-header">
+      <div class="section-tag reveal">DentOra Shop</div>
+      <h2 class="reveal">Premium <span>Oral Care</span> Products</h2>
+      <p class="reveal">Clinically tested, dentist-recommended products by DentOra for your daily oral care routine.</p>
+    </div>
+    <div class="products-grid four-col">
+      <!-- Row 1: Cinematic Essentials -->
+      <shopify-context type="product" handle="prowhite-whitening-kit">
+        <template>
+          <div class="product-card cinematic reveal">
+            <div class="product-badge">Bestseller</div>
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <shopify-context type="product" handle="sonicpro-electric-brush">
-      <template>
-        <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
-          <div class="product-badge">New</div>
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="sonicpro-electric-brush">
+        <template>
+          <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
+            <div class="product-badge">New</div>
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <shopify-context type="product" handle="freshguard-treatment">
-      <template>
-        <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="freshguard-treatment">
+        <template>
+          <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <!-- Daily Essentials -->
-    <shopify-context type="product" handle="water-flosser-oral-irrigator">
-      <template>
-        <div class="product-card cinematic reveal">
-          <div class="product-badge">Bestseller</div>
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="water-flosser-oral-irrigator">
+        <template>
+          <div class="product-card cinematic reveal">
+            <div class="product-badge">Bestseller</div>
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <shopify-context type="product" handle="premium-remineralizing-toothpaste">
-      <template>
-        <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
-          <div class="product-badge">New</div>
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="premium-remineralizing-toothpaste">
+        <template>
+          <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
+            <div class="product-badge">New</div>
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <shopify-context type="product" handle="ergonomic-tongue-scraper">
-      <template>
-        <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="ergonomic-tongue-scraper">
+        <template>
+          <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
+        </template>
+      </shopify-context>
 
-    <shopify-context type="product" handle="expanding-woven-dental-floss">
-      <template>
-        <div class="product-card cinematic reveal" style="transition-delay: 0.6s;">
-          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
-          <div class="product-info">
-            <div class="brand">DENTORA</div>
-            <h3><shopify-data query="product.title"></shopify-data></h3>
-            <p><shopify-data query="product.description"></shopify-data></p>
-            <div class="product-bottom">
-              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
-              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+      <shopify-context type="product" handle="expanding-woven-dental-floss">
+        <template>
+          <div class="product-card cinematic reveal" style="transition-delay: 0.6s;">
+            <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+            <div class="product-info">
+              <div class="brand">DENTORA</div>
+              <h3><shopify-data query="product.title"></shopify-data></h3>
+              <p><shopify-data query="product.description"></shopify-data></p>
+              <div class="product-bottom">
+                <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+                <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </shopify-context>
-  </div>
-</section>
-pify-context>
-  </div>
-</section>
+        </template>
+      </shopify-context>
+    </div>
+  </section>
+</shopify-store>
 
 <!-- Testimonials -->
 <section id="testimonials">
@@ -407,7 +401,7 @@ pify-context>
         <li><span class="icon">📞</span> +91 98560 XXXXX</li>
         <li><span class="icon">✉️</span> dentora.studio@gmail.com</li>
         <li><span class="icon">🕐</span> Mon – Sat: 9:00 AM – 7:00 PM</li>
-        <li><span class="icon">📸</span> <a href="https://www.instagram.com/dentora_dental.studio" target="_blank" style="color:var(--accent);">@dentora_dental.studio</a></li>
+        <li><span class="icon">📸</span> <a href="https://www.instagram.com/dentora_dental.studio/" target="_blank" style="color:var(--accent);">@dentora_dental.studio</a></li>
       </ul>
     </div>
     <form class="appointment-form reveal-right" id="appointment-form">
@@ -435,17 +429,17 @@ pify-context>
         <label>Available Time Slots *</label>
         <div class="time-slots" id="timeSlotsGrid">
           <div class="time-slot free">09:00 AM</div>
-          <div class="time-slot booked">09:30 AM</div>
+          <div class="time-slot free">09:30 AM</div>
           <div class="time-slot free">10:00 AM</div>
           <div class="time-slot free">10:30 AM</div>
-          <div class="time-slot booked">11:00 AM</div>
+          <div class="time-slot free">11:00 AM</div>
           <div class="time-slot free">11:30 AM</div>
           <div class="time-slot free">02:00 PM</div>
-          <div class="time-slot booked">02:30 PM</div>
+          <div class="time-slot free">02:30 PM</div>
           <div class="time-slot free">03:00 PM</div>
           <div class="time-slot free">03:30 PM</div>
           <div class="time-slot free">04:00 PM</div>
-          <div class="time-slot booked">04:30 PM</div>
+          <div class="time-slot free">04:30 PM</div>
         </div>
       </div>
       <div class="form-group">
@@ -504,17 +498,17 @@ pify-context>
         <li><a href="#shop">Whitening Kits</a></li>
         <li><a href="#shop">Electric Brushes</a></li>
         <li><a href="#shop">Mouthwash</a></li>
-        <li><a href="https://www.instagram.com/dentora_dental.studio" target="_blank">Follow on Instagram</a></li>
+        <li><a href="https://www.instagram.com/dentora_dental.studio/" target="_blank">Follow on Instagram</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
     <span>© 2024 DentOra Dental Studio. All rights reserved.</span>
     <div class="footer-social">
-      <a href="https://www.instagram.com/dentora_dental.studio" target="_blank" aria-label="Instagram">📷</a>
-      <a href="#" aria-label="Facebook">f</a>
-      <a href="#" aria-label="WhatsApp">💬</a>
-      <a href="tel:+919856000000" aria-label="Call">📞</a>
+      <a href="https://www.instagram.com/dentora_dental.studio/" target="_blank" aria-label="Instagram" class="social-icon">📸</a>
+      <a href="#" aria-label="Facebook" class="social-icon">f</a>
+      <a href="#" aria-label="WhatsApp" class="social-icon">💬</a>
+      <a href="tel:+919856000000" aria-label="Call" class="social-icon">📞</a>
     </div>
   </div>
 </footer>

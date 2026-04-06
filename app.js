@@ -175,14 +175,25 @@ function initBooking() {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const selectedSlot = document.querySelector('.time-slot.selected');
+      
+      // Strict re-verification
       if (!selectedSlot) {
         showToast('Please select a time slot.');
+        return;
+      }
+      if (selectedSlot.classList.contains('booked')) {
+        showToast('This slot is already booked for the selected date.');
         return;
       }
 
       const formData = new FormData(form);
       const data = Object.fromEntries(formData);
       
+      if (!data.date) {
+        showToast('Please select a date.');
+        return;
+      }
+
       // Save booking
       const newBooking = {
         time: selectedSlot.textContent,
@@ -212,7 +223,10 @@ function renderSlots() {
 }
 
 // Re-render when date changes
-document.getElementById('appointment-date')?.addEventListener('change', renderSlots);
+const dateInput = document.getElementById('date');
+if (dateInput) {
+  dateInput.addEventListener('change', renderSlots);
+}
 initBooking();
 
 const successClose = document.getElementById('success-close');
@@ -310,14 +324,13 @@ function init3D() {
   scene.add(modelGroup);
 
   // --- MATERIALS ---
-  const enamelMat = new THREE.MeshPhysicalMaterial({
+  const porcelainMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    roughness: 0.05,
+    roughness: 0.1,
     metalness: 0.0,
     clearcoat: 1.0,
     reflectivity: 1.0,
-    transmission: 0.1,
-    thickness: 1.0
+    transmission: 0, // Opaque Porcelain
   });
 
   const chromeMat = new THREE.MeshStandardMaterial({
@@ -326,74 +339,75 @@ function init3D() {
     roughness: 0.02
   });
 
-  // --- 1. THE TOOTH (Anatomical Stylized) ---
+  // --- 1. THE TOOTH (High Fidelity) ---
   const toothGroup = new THREE.Group();
   
-  const crownGeo = new THREE.SphereGeometry(1.2, 32, 24);
-  const crown = new THREE.Mesh(crownGeo, enamelMat);
-  crown.scale.set(1, 1.1, 0.9);
+  const crownGeo = new THREE.SphereGeometry(1.1, 32, 24);
+  const crown = new THREE.Mesh(crownGeo, porcelainMat);
+  crown.scale.set(1, 1.15, 0.95);
   toothGroup.add(crown);
 
-  const rootGeo = new THREE.CylinderGeometry(0.4, 0.1, 1.2, 16);
-  const root1 = new THREE.Mesh(rootGeo, enamelMat);
-  root1.position.set(0.35, -1, 0);
-  root1.rotation.z = 0.2;
+  const rootGeo = new THREE.CylinderGeometry(0.4, 0.1, 1.3, 16);
+  const root1 = new THREE.Mesh(rootGeo, porcelainMat);
+  root1.position.set(0.35, -1.1, 0);
+  root1.rotation.z = 0.25;
   toothGroup.add(root1);
 
-  const root2 = new THREE.Mesh(rootGeo, enamelMat);
-  root2.position.set(-0.35, -1, 0);
-  root2.rotation.z = -0.2;
+  const root2 = new THREE.Mesh(rootGeo, porcelainMat);
+  root2.position.set(-0.35, -1.1, 0);
+  root2.rotation.z = -0.25;
   toothGroup.add(root2);
 
   modelGroup.add(toothGroup);
 
-  // --- 2. THE CHROME CRADLE ---
-  const cradleGeo = new THREE.TorusGeometry(2.2, 0.15, 16, 100, Math.PI);
+  // --- 2. THE CHROME CRADLE (Image 2 Replica) ---
+  // Thick, wide architectural U-shape
+  const cradleGeo = new THREE.TorusGeometry(2.1, 0.5, 24, 100, Math.PI); 
   const cradle = new THREE.Mesh(cradleGeo, chromeMat);
-  cradle.scale.set(1.4, 0.8, 1);
-  cradle.rotation.x = Math.PI / 2.2;
-  cradle.position.y = -0.4;
+  cradle.scale.set(1.5, 0.8, 1);
+  cradle.rotation.x = Math.PI / 2.1;
+  cradle.position.y = -0.3;
   modelGroup.add(cradle);
 
-  // --- 3. DENTAL INSTRUMENTS ---
+  // --- 3. DENTAL INSTRUMENTS (Professional Crossing) ---
   const mirrorGroup = new THREE.Group();
-  const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 5, 12);
+  const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 5.5, 12);
   const handle = new THREE.Mesh(handleGeo, chromeMat);
   mirrorGroup.add(handle);
 
-  const headGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.05, 32);
+  const headGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.08, 32);
   const head = new THREE.Mesh(headGeo, chromeMat);
-  head.position.y = 2.5;
-  head.rotation.x = Math.PI / 4;
+  head.position.y = 2.7;
+  head.rotation.x = Math.PI / 3.5;
   mirrorGroup.add(head);
   
-  mirrorGroup.position.set(2, 1, -1);
-  mirrorGroup.rotation.z = -Math.PI / 4;
+  mirrorGroup.position.set(2.4, 1.2, -1);
+  mirrorGroup.rotation.z = -Math.PI / 3.5;
   modelGroup.add(mirrorGroup);
 
   const probeGroup = new THREE.Group();
   const probeHandle = new THREE.Mesh(handleGeo, chromeMat);
   probeGroup.add(probeHandle);
   
-  const hookGeo = new THREE.TorusGeometry(0.3, 0.05, 8, 24, Math.PI);
+  const hookGeo = new THREE.TorusGeometry(0.35, 0.06, 8, 24, Math.PI);
   const hook = new THREE.Mesh(hookGeo, chromeMat);
-  hook.position.y = 2.5;
-  hook.rotation.z = Math.PI / 2;
+  hook.position.y = 2.7;
+  hook.rotation.z = Math.PI / 1.5;
   probeGroup.add(hook);
 
-  probeGroup.position.set(-2, 1, -1);
-  probeGroup.rotation.z = Math.PI / 4;
+  probeGroup.position.set(-2.4, 1.2, -1);
+  probeGroup.rotation.z = Math.PI / 3.5;
   modelGroup.add(probeGroup);
 
   // --- LIGHTING ---
-  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
   
-  const light1 = new THREE.DirectionalLight(0xffffff, 1.2);
-  light1.position.set(5, 10, 5);
+  const light1 = new THREE.DirectionalLight(0xffffff, 1.8);
+  light1.position.set(5, 15, 10);
   scene.add(light1);
 
-  const light2 = new THREE.PointLight(0x00f2ff, 0.8);
-  light2.position.set(-5, -2, 2);
+  const light2 = new THREE.PointLight(0x00f2ff, 1.0);
+  light2.position.set(-8, -5, 5);
   scene.add(light2);
 
   // --- ANIMATION ---
@@ -407,14 +421,14 @@ function init3D() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    modelGroup.position.y = Math.sin(time * 0.8) * 0.15;
+    modelGroup.position.y = Math.sin(time * 0.8) * 0.1;
     
-    const scale = 1 + Math.sin(time * 1.5) * 0.015;
+    const scale = 1 + Math.sin(time * 1.5) * 0.01;
     toothGroup.scale.set(scale, scale, scale);
 
-    modelGroup.rotation.y += 0.003;
-    modelGroup.rotation.x += (mouseY * 0.15 - modelGroup.rotation.x) * 0.05;
-    modelGroup.rotation.y += (mouseX * 0.15 - modelGroup.rotation.y) * 0.05;
+    modelGroup.rotation.y += 0.002;
+    modelGroup.rotation.x += (mouseY * 0.12 - modelGroup.rotation.x) * 0.05;
+    modelGroup.rotation.y += (mouseX * 0.12 - modelGroup.rotation.y) * 0.05;
     
     renderer.render(scene, camera);
   }
