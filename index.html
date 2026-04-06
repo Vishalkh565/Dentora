@@ -29,8 +29,14 @@
 <div class="cursor-dot"></div>
 <div class="cursor-ring"></div>
 
-<!-- Shopify Store Injection Target -->
-<div id="shopify-store-container"></div>
+<!-- Shopify Store (Hardcoded for immediate SDK detection) -->
+<shopify-store 
+  id="main-store" 
+  store-domain="dentoraclinic.myshopify.com" 
+  public-access-token="f41ed97311b7ca020be1dac2dc6a8bf9"
+  country="IN" 
+  language="en">
+</shopify-store>
 
 <!-- Floating Particles -->
 <div class="particles"></div>
@@ -219,7 +225,7 @@
     <!-- Row 1: Cinematic Essentials -->
     <shopify-context type="product" handle="prowhite-whitening-kit">
       <template>
-        <div class="product-card cinematic reveal" data-price="2499">
+        <div class="product-card cinematic reveal">
           <div class="product-badge">Bestseller</div>
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
@@ -237,7 +243,7 @@
 
     <shopify-context type="product" handle="sonicpro-electric-brush">
       <template>
-        <div class="product-card cinematic reveal" data-price="6999" style="transition-delay: 0.2s;">
+        <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
           <div class="product-badge">New</div>
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
@@ -255,7 +261,7 @@
 
     <shopify-context type="product" handle="freshguard-treatment">
       <template>
-        <div class="product-card cinematic reveal" data-price="699" style="transition-delay: 0.4s;">
+        <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
             <div class="brand">DENTORA</div>
@@ -273,7 +279,7 @@
     <!-- Daily Essentials -->
     <shopify-context type="product" handle="water-flosser-oral-irrigator">
       <template>
-        <div class="product-card cinematic reveal" data-price="4900">
+        <div class="product-card cinematic reveal">
           <div class="product-badge">Bestseller</div>
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
@@ -291,7 +297,7 @@
 
     <shopify-context type="product" handle="premium-remineralizing-toothpaste">
       <template>
-        <div class="product-card cinematic reveal" data-price="650" style="transition-delay: 0.2s;">
+        <div class="product-card cinematic reveal" style="transition-delay: 0.2s;">
           <div class="product-badge">New</div>
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
@@ -309,7 +315,7 @@
 
     <shopify-context type="product" handle="ergonomic-tongue-scraper">
       <template>
-        <div class="product-card cinematic reveal" data-price="350" style="transition-delay: 0.4s;">
+        <div class="product-card cinematic reveal" style="transition-delay: 0.4s;">
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
             <div class="brand">DENTORA</div>
@@ -326,7 +332,7 @@
 
     <shopify-context type="product" handle="expanding-woven-dental-floss">
       <template>
-        <div class="product-card cinematic reveal" data-price="250" style="transition-delay: 0.6s;">
+        <div class="product-card cinematic reveal" style="transition-delay: 0.6s;">
           <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
           <div class="product-info">
             <div class="brand">DENTORA</div>
@@ -340,6 +346,9 @@
         </div>
       </template>
     </shopify-context>
+  </div>
+</section>
+pify-context>
   </div>
 </section>
 

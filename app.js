@@ -11,30 +11,7 @@ window.addEventListener('load', () => {
 const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 'dentoraclinic.myshopify.com';
 const SHOPIFY_TOKEN = import.meta.env.VITE_SHOPIFY_PUBLIC_ACCESS_TOKEN || 'f41ed97311b7ca020be1dac2dc6a8bf9';
 
-function initShopify() {
-  const container = document.getElementById('shopify-store-container');
-  if (container) {
-    // Ensure the container is empty first
-    container.innerHTML = '';
-    
-    // Create the store element dynamically
-    const storeEl = document.createElement('shopify-store');
-    storeEl.id = 'main-store';
-    
-    // Use synchronous config if available, fallback to environment or hardcoded
-    const domain = window.SHOPIFY_CONFIG?.domain || SHOPIFY_DOMAIN;
-    const token = window.SHOPIFY_CONFIG?.token || SHOPIFY_TOKEN;
-    
-    storeEl.setAttribute('store-domain', domain);
-    storeEl.setAttribute('public-access-token', token);
-    storeEl.setAttribute('country', 'IN');
-    storeEl.setAttribute('language', 'en');
-    
-    container.appendChild(storeEl);
-    console.log('[SHOPIFY] Dynamic Store Injected:', domain);
-  }
-}
-initShopify();
+// Shopify initialization removed: Handled synchronously in index.html for maximum reliability
 
 // ==================== CUSTOM CURSOR ====================
 const cursorDot = document.querySelector('.cursor-dot');
@@ -332,79 +309,94 @@ function init3D() {
   const modelGroup = new THREE.Group();
   scene.add(modelGroup);
 
-  // --- 1. THE TOOTH (Realistic Molar) ---
-  const toothGroup = new THREE.Group();
-  
-  // Crown
-  const crownGeo = new THREE.BoxGeometry(1.6, 1.4, 1.5, 2, 2, 2);
+  // --- MATERIALS ---
   const enamelMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    roughness: 0.1,
+    roughness: 0.05,
     metalness: 0.0,
     clearcoat: 1.0,
     reflectivity: 1.0,
-    transmission: 0.05
+    transmission: 0.1,
+    thickness: 1.0
   });
-  const crown = new THREE.Mesh(crownGeo, enamelMat);
-  crown.scale.set(1.1, 1, 1.05);
-  toothGroup.add(crown);
 
-  // Roots (2 simplified roots)
-  const rootGeo = new THREE.CylinderGeometry(0.35, 0.05, 0.8, 8);
-  const root1 = new THREE.Mesh(rootGeo, enamelMat);
-  root1.position.set(0.4, -0.9, 0);
-  root1.rotation.z = 0.3;
-  toothGroup.add(root1);
-  
-  const root2 = new THREE.Mesh(rootGeo, enamelMat);
-  root2.position.set(-0.4, -0.9, 0);
-  root2.rotation.z = -0.3;
-  toothGroup.add(root2);
-
-  toothGroup.position.y = 0.5;
-  modelGroup.add(toothGroup);
-
-  // --- 2. THE DENTAL MIRROR (Chrome Instrument) ---
-  const mirrorGroup = new THREE.Group();
-  
-  // Mirror Disc
-  const discGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.1, 32);
   const chromeMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     metalness: 1.0,
     roughness: 0.02
   });
-  const disc = new THREE.Mesh(discGeo, chromeMat);
-  disc.rotation.x = Math.PI / 4;
-  mirrorGroup.add(disc);
 
-  // Handle
-  const handleGeo = new THREE.CylinderGeometry(0.12, 0.12, 4, 16);
+  // --- 1. THE TOOTH (Anatomical Stylized) ---
+  const toothGroup = new THREE.Group();
+  
+  const crownGeo = new THREE.SphereGeometry(1.2, 32, 24);
+  const crown = new THREE.Mesh(crownGeo, enamelMat);
+  crown.scale.set(1, 1.1, 0.9);
+  toothGroup.add(crown);
+
+  const rootGeo = new THREE.CylinderGeometry(0.4, 0.1, 1.2, 16);
+  const root1 = new THREE.Mesh(rootGeo, enamelMat);
+  root1.position.set(0.35, -1, 0);
+  root1.rotation.z = 0.2;
+  toothGroup.add(root1);
+
+  const root2 = new THREE.Mesh(rootGeo, enamelMat);
+  root2.position.set(-0.35, -1, 0);
+  root2.rotation.z = -0.2;
+  toothGroup.add(root2);
+
+  modelGroup.add(toothGroup);
+
+  // --- 2. THE CHROME CRADLE ---
+  const cradleGeo = new THREE.TorusGeometry(2.2, 0.15, 16, 100, Math.PI);
+  const cradle = new THREE.Mesh(cradleGeo, chromeMat);
+  cradle.scale.set(1.4, 0.8, 1);
+  cradle.rotation.x = Math.PI / 2.2;
+  cradle.position.y = -0.4;
+  modelGroup.add(cradle);
+
+  // --- 3. DENTAL INSTRUMENTS ---
+  const mirrorGroup = new THREE.Group();
+  const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 5, 12);
   const handle = new THREE.Mesh(handleGeo, chromeMat);
-  handle.position.set(0, -2, -0.8);
-  handle.rotation.x = Math.PI / 8;
   mirrorGroup.add(handle);
 
-  mirrorGroup.position.y = -1.2;
+  const headGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.05, 32);
+  const head = new THREE.Mesh(headGeo, chromeMat);
+  head.position.y = 2.5;
+  head.rotation.x = Math.PI / 4;
+  mirrorGroup.add(head);
+  
+  mirrorGroup.position.set(2, 1, -1);
+  mirrorGroup.rotation.z = -Math.PI / 4;
   modelGroup.add(mirrorGroup);
 
-  // --- 3. LIGHTING (Clinical Studio) ---
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambientLight);
+  const probeGroup = new THREE.Group();
+  const probeHandle = new THREE.Mesh(handleGeo, chromeMat);
+  probeGroup.add(probeHandle);
+  
+  const hookGeo = new THREE.TorusGeometry(0.3, 0.05, 8, 24, Math.PI);
+  const hook = new THREE.Mesh(hookGeo, chromeMat);
+  hook.position.y = 2.5;
+  hook.rotation.z = Math.PI / 2;
+  probeGroup.add(hook);
 
-  const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  mainLight.position.set(5, 10, 5);
-  scene.add(mainLight);
+  probeGroup.position.set(-2, 1, -1);
+  probeGroup.rotation.z = Math.PI / 4;
+  modelGroup.add(probeGroup);
 
-  const rimLight = new THREE.PointLight(0x00f2ff, 1.0, 20); // Cyan rim highlight
-  rimLight.position.set(-5, -3, 2);
-  scene.add(rimLight);
+  // --- LIGHTING ---
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  
+  const light1 = new THREE.DirectionalLight(0xffffff, 1.2);
+  light1.position.set(5, 10, 5);
+  scene.add(light1);
 
-  const topLight = new THREE.PointLight(0xffffff, 1.2, 20);
-  topLight.position.set(0, 5, 0);
-  scene.add(topLight);
+  const light2 = new THREE.PointLight(0x00f2ff, 0.8);
+  light2.position.set(-5, -2, 2);
+  scene.add(light2);
 
-  // --- 4. ANIMATION & INTERACTION ---
+  // --- ANIMATION ---
   let mouseX = 0, mouseY = 0;
   document.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -415,17 +407,14 @@ function init3D() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    // Gentle float
     modelGroup.position.y = Math.sin(time * 0.8) * 0.15;
     
-    // Breathing scale effect for the tooth
-    const scale = 1 + Math.sin(time * 1.5) * 0.02;
+    const scale = 1 + Math.sin(time * 1.5) * 0.015;
     toothGroup.scale.set(scale, scale, scale);
 
-    // Smooth interaction rotation
-    modelGroup.rotation.y += 0.003; // Constant slow spin
-    modelGroup.rotation.x += (mouseY * 0.25 - modelGroup.rotation.x) * 0.04;
-    modelGroup.rotation.y += (mouseX * 0.25 - modelGroup.rotation.y) * 0.04;
+    modelGroup.rotation.y += 0.003;
+    modelGroup.rotation.x += (mouseY * 0.15 - modelGroup.rotation.x) * 0.05;
+    modelGroup.rotation.y += (mouseX * 0.15 - modelGroup.rotation.y) * 0.05;
     
     renderer.render(scene, camera);
   }
