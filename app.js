@@ -250,6 +250,27 @@ loadShopifyProducts();
 // Expose addToCart globally for inline onclick handlers
 window.addToCart = addToCart;
 
+// Fetch actual cart count on initial load
+async function checkCartCount() {
+  if (shopifyCartId) {
+    try {
+      const res = await fetch(STOREFRONT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN },
+        body: JSON.stringify({ query: `{ cart(id: "${shopifyCartId}") { totalQuantity } }` })
+      });
+      const json = await res.json();
+      if (json.data?.cart) {
+        updateCartCount(json.data.cart.totalQuantity);
+      } else {
+        shopifyCartId = null;
+        localStorage.removeItem('dentora_shopify_cart_id');
+      }
+    } catch(e) { console.error('Cart check failed', e); }
+  }
+}
+checkCartCount();
+
 // ==================== CUSTOM MODAL CART ====================
 window.openCart = async function() {
   const modal = document.getElementById('main-cart');
@@ -277,6 +298,7 @@ window.openCart = async function() {
             cost { totalAmount { amount currencyCode } }
             lines(first: 10) { 
               edges { node { 
+                id
                 quantity 
                 merchandise { ... on ProductVariant { title product { title } image { url } price { amount currencyCode } } } 
               } }
@@ -290,6 +312,8 @@ window.openCart = async function() {
 
     if (!cart || !cart.lines.edges.length) {
       cartContent.innerHTML = `<div class="empty-state">🦷 Your cart is empty</div>`;
+      // Update count on top navbar since it's empty
+      updateCartCount(0);
       return;
     }
 
@@ -305,7 +329,10 @@ window.openCart = async function() {
              <h4>${p.title}</h4>
              <span class="qty">Qty: ${line.quantity}</span>
            </div>
-           <div class="cart-line-price">₹${parseFloat(line.merchandise.price.amount).toLocaleString('en-IN')}</div>
+           <div class="cart-line-price">
+             <div style="font-weight:600;color:#fff;">₹${parseFloat(line.merchandise.price.amount).toLocaleString('en-IN')}</div>
+             <button class="remove-btn" onclick="removeCartItem('${line.id}', this)">Remove</button>
+           </div>
          </div>
        `;
     });
@@ -320,6 +347,36 @@ window.openCart = async function() {
     cartContent.innerHTML = html;
   } catch(e) {
     if (cartContent) cartContent.innerHTML = `<div class="empty-state">Unable to load cart.</div>`;
+  }
+}
+
+window.removeCartItem = async function(lineId, btn) {
+  btn.textContent = 'Removing...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(STOREFRONT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN },
+      body: JSON.stringify({
+        query: `mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+          cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+            cart { id totalQuantity }
+          }
+        }`,
+        variables: { cartId: shopifyCartId, lineIds: [lineId] }
+      })
+    });
+    const json = await res.json();
+    const cart = json.data?.cartLinesRemove?.cart;
+    if (cart) {
+      updateCartCount(cart.totalQuantity);
+      // Reload cart to show updated state
+      openCart();
+    }
+  } catch(e) {
+    console.error('Failed to remove item', e);
+    btn.textContent = 'Remove';
+    btn.disabled = false;
   }
 }
 

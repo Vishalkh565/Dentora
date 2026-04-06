@@ -602,7 +602,20 @@ footer { background:var(--bg-dark-brown); border-top:1px solid rgba(255,255,255,
   margin: 0 0 6px 0;
 }
 .cart-line-info .qty { color: #aaa; font-size: 0.9rem; }
-.cart-line-price { margin-left: auto; font-weight: 600; color: #fff; }
+.cart-line-price { margin-left: auto; text-align: right; }
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.remove-btn:hover { opacity: 1; text-decoration: none; }
 
 .cart-total { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(196,168,124,0.2); font-size: 1.2rem; font-weight: 600; }
 
