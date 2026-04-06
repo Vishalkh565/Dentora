@@ -688,7 +688,7 @@ footer { background:var(--bg-dark-brown); border-top:1px solid rgba(255,255,255,
   .about-grid { grid-template-columns:1fr; gap:40px; }
   .appointment-container { grid-template-columns:1fr; }
   .footer-grid { grid-template-columns:1fr 1fr; }
-  #three-canvas { width:40%; opacity:0.4; }
+  #three-canvas { width:100%; opacity:0.3; pointer-events:none; }
 }
 @media(max-width:768px) {
   .nav-links { display:none; }
@@ -704,7 +704,7 @@ footer { background:var(--bg-dark-brown); border-top:1px solid rgba(255,255,255,
   .services-fan { height: auto; flex-direction: column; gap: 20px; }
   .services-fan .service-card { position: relative; transform: none !important; width: 100%; height: auto; }
   .doctors-grid, .products-grid { grid-template-columns:1fr; }
-  #three-canvas { display:none; }
+  #three-canvas { display:block; width:100%; opacity:0.18; pointer-events:none; }
   .section-header h2 { font-size:2.2rem; }
   .footer-grid { grid-template-columns:1fr; }
   .footer-bottom { flex-direction:column; gap:16px; text-align:center; }

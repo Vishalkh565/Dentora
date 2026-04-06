@@ -760,7 +760,7 @@ function init3D() {
   
   blobGroup.add(blobMesh);
   
-  blobGroup.position.set(2.2, 0, 1.0); // Positioned on the right side
+  blobGroup.position.set(2.2, 0, 1.0); // Initial Desktop Position
   modelGroup.add(blobGroup);
 
   // --- 2. THE BACKGROUND WIREFRAME ---
@@ -793,11 +793,24 @@ function init3D() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    modelGroup.position.y = Math.sin(time * 0.8) * 0.1;
+    // Smooth Responsive Re-Positioning
+    const isMobile = window.innerWidth <= 768;
+    const targetX = isMobile ? 0 : 2.2;
+    const targetY = isMobile ? 1.5 : 0;
+    const targetZ = isMobile ? -2.0 : 1.0;
+
+    blobGroup.position.x += (targetX - blobGroup.position.x) * 0.05;
+    blobGroup.position.y += ((targetY + Math.sin(time * 0.8) * 0.1) - blobGroup.position.y) * 0.05;
+    blobGroup.position.z += (targetZ - blobGroup.position.z) * 0.05;
 
     // Organic scaling pulse
-    const blobScale = 1 + Math.sin(time * 1.5) * 0.02;
-    blobGroup.scale.set(blobScale, blobScale, blobScale);
+    const baseScale = isMobile ? 0.75 : 1.0;
+    const pulse = Math.sin(time * 1.5) * 0.02;
+    blobGroup.scale.set(
+      (1.2 + pulse) * baseScale, 
+      (0.9 + pulse) * baseScale, 
+      (1.0 + pulse) * baseScale
+    );
 
     blobGroup.rotation.x += 0.001;
     blobGroup.rotation.y -= 0.002;
