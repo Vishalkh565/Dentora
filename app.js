@@ -751,39 +751,34 @@ function init3D() {
   // --- 1. THE ABSTRACT ORGANIC BLOB (Foreground) ---
   const blobGroup = new THREE.Group();
   
-  const blobGeo = new THREE.IcosahedronGeometry(2.5, 2);
-  const posAttribute = blobGeo.attributes.position;
-  // Randomly displace vertices to make it organic and irregular
-  for (let i = 0; i < posAttribute.count; i++) {
-    const v = new THREE.Vector3().fromBufferAttribute(posAttribute, i);
-    v.normalize().multiplyScalar(2.0 + Math.random() * 0.8);
-    posAttribute.setXYZ(i, v.x, v.y, v.z);
-  }
-  blobGeo.computeVertexNormals();
-
+  // Create a chunky organic low-poly shape safely
+  const blobGeo = new THREE.DodecahedronGeometry(2.8, 1);
   const blobMesh = new THREE.Mesh(blobGeo, blobMat);
+  
+  // Scale it slightly non-uniformly to make it look like an organic mass
+  blobMesh.scale.set(1.2, 0.9, 1.0);
+  
   blobGroup.add(blobMesh);
   
-  blobGroup.position.set(2.0, 0, 1.0); // Positioned prominently on the right
+  blobGroup.position.set(2.2, 0, 1.0); // Positioned on the right side
   modelGroup.add(blobGroup);
 
   // --- 2. THE BACKGROUND WIREFRAME ---
-  // Large background constellation/wireframe effect
-  const wireGeo = new THREE.IcosahedronGeometry(4.0, 1);
+  const wireGeo = new THREE.IcosahedronGeometry(5.0, 1);
   const wireMesh = new THREE.Mesh(wireGeo, wireMat);
-  wireMesh.position.set(-1.0, 0, -3.0);
+  wireMesh.position.set(-1.0, 0, -4.0);
   modelGroup.add(wireMesh);
 
   // --- LIGHTING (Crucial for the golden diamond reflections) ---
-  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   
-  // Golden light that reflects off the flat facets
-  const goldLight1 = new THREE.PointLight(0xffaa44, 3.0, 50);
-  goldLight1.position.set(3, 3, 5);
+  // Intense Golden light that reflects off the flat facets
+  const goldLight1 = new THREE.PointLight(0xffaa44, 150.0, 100);
+  goldLight1.position.set(4, 4, 6);
   scene.add(goldLight1);
 
-  // Secondary bright light
-  const goldLight2 = new THREE.PointLight(0xffeeaa, 1.5, 50);
+  // Intense Secondary bright light
+  const goldLight2 = new THREE.PointLight(0xffeeaa, 100.0, 100);
   goldLight2.position.set(-2, -5, 4);
   scene.add(goldLight2);
 
