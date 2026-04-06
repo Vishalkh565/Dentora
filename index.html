@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DentOra — A Multispeciality Dental Clinic | Dr. Priyakumari Laikhuram</title>
+  <meta name="description" content="DentOra - A Multispeciality Dental Clinic by Dr. Priyakumari Laikhuram. Premium dental care, cosmetic dentistry, orthodontics & oral surgery in India.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <!-- Shopify Storefront SDK -->
+  <script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-tooth"></div>
+  <div class="loader-text">DENTORA</div>
+</div>
+
+<!-- Custom Cursor -->
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<!-- Shopify Store Configuration -->
+<shopify-store
+  store-domain="%VITE_SHOPIFY_STORE_DOMAIN%"
+  public-access-token="%VITE_SHOPIFY_PUBLIC_ACCESS_TOKEN%"
+  country="IN"
+  language="en"
+></shopify-store>
+
+<!-- Floating Particles -->
+<div class="particles"></div>
+
+<!-- Navigation -->
+<nav style="flex-direction: row-reverse;">
+  <a href="#" class="nav-logo stylish-logo">
+    <img src="logo.jpg" alt="DentOra Logo">
+    <span>DentOra</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <button id="cart-btn" style="background:none;border:none;color:var(--text-dark);font-size:1.1rem;cursor:pointer;position:relative;" onclick="document.getElementById('main-cart').showModal()">
+      🛒 <span id="cart-count">0</span>
+    </button>
+    <button class="nav-cta" onclick="document.getElementById('appointment').scrollIntoView({behavior:'smooth'})">Book Appointment</button>
+    <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#doctors">Our Team</a></li>
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#appointment">Book Now</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-bg"><img src="hero_bg.png" alt="Dental Clinic"></div>
+  <canvas id="three-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge reveal"><div class="dot"></div> Multispeciality Dental Care</div>
+    <h1 class="reveal">Your Smile, <span>Our Expertise</span></h1>
+    <p class="reveal">Welcome to DentOra — where advanced dental science meets compassionate care. Led by Dr. Priyakumari Laikhuram, we deliver world-class treatments in a warm, comfortable environment.</p>
+    <div class="hero-btns reveal">
+      <a href="#appointment" class="btn-primary">Book Appointment →</a>
+      <a href="#services" class="btn-secondary">Our Services</a>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="hero-stat">
+        <h3 data-target="5000" data-suffix="+">0</h3>
+        <p>Happy Patients</p>
+      </div>
+      <div class="hero-stat">
+        <h3 data-target="15" data-suffix="+">0</h3>
+        <p>Years Experience</p>
+      </div>
+      <div class="hero-stat">
+        <h3 data-target="98" data-suffix="%">0</h3>
+        <p>Success Rate</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services">
+  <div class="section-header">
+    <div class="section-tag reveal">Our Services</div>
+    <h2 class="reveal">Comprehensive Dental <span>Solutions</span></h2>
+    <p class="reveal">From routine check-ups to advanced cosmetic & surgical procedures — complete dental care under one roof.</p>
+  </div>
+  <div class="services-fan" id="services-fan">
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #A88F80, #6B5438);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&q=80" alt="Root Canal">
+      </div>
+      <div>
+        <h3>Root Canal</h3>
+        <p>Pain-free RCT using advanced endodontics.</p>
+      </div>
+      <span class="price">From ₹3,500</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #005C8A, #003B5C);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80" alt="Teeth Whitening">
+      </div>
+      <div>
+        <h3>Teeth Whitening</h3>
+        <p>In-office & take-home whitening systems.</p>
+      </div>
+      <span class="price">From ₹5,000</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #8A65B0, #5C3A8A);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=500&q=80" alt="Braces">
+      </div>
+      <div>
+        <h3>Braces</h3>
+        <p>Metal, ceramic braces & clear aligners.</p>
+      </div>
+      <span class="price">From ₹25,000</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #8D9E8A, #5A6B56);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=500&q=80" alt="Implants">
+      </div>
+      <div>
+        <h3>Implants</h3>
+        <p>Premium titanium implants for missing teeth.</p>
+      </div>
+      <span class="price">From ₹20,000</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #E6EAE5, #B3B9B1);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&q=80" alt="Smile Design">
+      </div>
+      <div>
+        <h3>Smile Design</h3>
+        <p>Complete smile makeover with veneers.</p>
+      </div>
+      <span class="price">From ₹8,000</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #4FA5C2, #2A6A80);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=500&q=80" alt="Pediatric Care">
+      </div>
+      <div>
+        <h3>Pediatric Care</h3>
+        <p>Gentle, child-friendly dental care.</p>
+      </div>
+      <span class="price">From ₹500</span>
+    </div>
+    <div class="service-card reveal" style="--card-color: linear-gradient(135deg, #C2706A, #8A3D38);">
+      <div class="service-img-wrapper">
+        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=500&q=80" alt="Oral Surgery">
+      </div>
+      <div>
+        <h3>Oral Surgery</h3>
+        <p>Wisdom tooth extraction & jaw surgery.</p>
+      </div>
+      <span class="price">From ₹2,000</span>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img reveal-left">
+      <img src="clinic_interior.png" alt="DentOra Clinic Interior">
+    </div>
+    <div class="about-text reveal-right">
+      <div class="section-tag">About DentOra</div>
+      <h2>A Multispeciality <span>Dental Clinic</span></h2>
+      <p>DentOra is a state-of-the-art multispeciality dental clinic founded by Dr. Priyakumari Laikhuram. With a passion for transforming smiles and improving oral health, we combine cutting-edge dental technology with a warm, patient-first approach.</p>
+      <p>Every treatment plan is personalized — because we believe each smile is unique and deserves individual attention and care.</p>
+      <div class="about-features">
+        <div class="about-feature"><span class="icon">✓</span> Advanced Equipment</div>
+        <div class="about-feature"><span class="icon">✓</span> Painless Procedures</div>
+        <div class="about-feature"><span class="icon">✓</span> Sterilized Environment</div>
+        <div class="about-feature"><span class="icon">✓</span> Affordable Pricing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Doctors -->
+<section id="doctors">
+  <div class="section-header">
+    <div class="section-tag reveal">Our Team</div>
+    <h2 class="reveal">Meet Our <span>Specialists</span></h2>
+    <p class="reveal">Experienced professionals committed to delivering the highest standard of dental care with warmth and precision.</p>
+  </div>
+  <div class="doctors-grid single-doctor">
+    <div class="doctor-card reveal">
+      <div class="doctor-img"><img src="dr_priyakumari_vertical.jpg" alt="Dr. Priyakumari Laikhuram"></div>
+      <div class="doctor-info">
+        <h3>Dr. Priyakumari Laikhuram</h3>
+        <div class="specialty">Founder & Lead Dentist</div>
+        <p>BDS, MDS — Specializing in cosmetic dentistry, implantology, and smile design with 15+ years of experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Shop -->
+<section id="shop">
+  <div class="section-header">
+    <div class="section-tag reveal">DentOra Shop</div>
+    <h2 class="reveal">Premium <span>Oral Care</span> Products</h2>
+    <p class="reveal">Clinically tested, dentist-recommended products by DentOra for your daily oral care routine.</p>
+  </div>
+  <div class="products-grid four-col">
+    <!-- Row 1: Cinematic Essentials -->
+    <shopify-context type="product" handle="prowhite-whitening-kit">
+      <template>
+        <div class="product-card cinematic reveal" data-price="2499">
+          <div class="product-badge">Bestseller</div>
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <shopify-context type="product" handle="sonicpro-electric-brush">
+      <template>
+        <div class="product-card cinematic reveal" data-price="6999" style="transition-delay: 0.2s;">
+          <div class="product-badge">New</div>
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <shopify-context type="product" handle="freshguard-treatment">
+      <template>
+        <div class="product-card cinematic reveal" data-price="699" style="transition-delay: 0.4s;">
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <shopify-money class="old" query="product.selectedOrFirstAvailableVariant.compareAtPrice" shopify-attr--hidden="!product.selectedOrFirstAvailableVariant.compareAtPrice.amount"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <!-- Daily Essentials -->
+    <shopify-context type="product" handle="water-flosser-oral-irrigator">
+      <template>
+        <div class="product-card cinematic reveal" data-price="4900">
+          <div class="product-badge">Bestseller</div>
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <shopify-context type="product" handle="premium-remineralizing-toothpaste">
+      <template>
+        <div class="product-card cinematic reveal" data-price="650" style="transition-delay: 0.2s;">
+          <div class="product-badge">New</div>
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <shopify-context type="product" handle="ergonomic-tongue-scraper">
+      <template>
+        <div class="product-card cinematic reveal" data-price="350" style="transition-delay: 0.4s;">
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+
+    <shopify-context type="product" handle="expanding-woven-dental-floss">
+      <template>
+        <div class="product-card cinematic reveal" data-price="250" style="transition-delay: 0.6s;">
+          <div class="product-img"><shopify-media width="400" height="400" query="product.selectedOrFirstAvailableVariant.image"></shopify-media></div>
+          <div class="product-info">
+            <div class="brand">DENTORA</div>
+            <h3><shopify-data query="product.title"></shopify-data></h3>
+            <p><shopify-data query="product.description"></shopify-data></p>
+            <div class="product-bottom">
+              <div class="product-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+              <button class="btn-cart" onclick="document.getElementById('main-cart').addLine(event).showModal();">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </shopify-context>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials">
+  <div class="section-header">
+    <div class="section-tag reveal">Patient Reviews</div>
+    <h2 class="reveal">What Our <span>Patients Say</span></h2>
+  </div>
+  <div class="testimonials-wrapper reveal">
+    <div class="testimonial-card active">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Dr. Priyakumari is absolutely amazing! I was so scared of root canal but she made the entire procedure painless. The clinic is super clean and the staff is very caring. Highly recommended!"</blockquote>
+      <div class="author">Thangjam Romita</div>
+      <div class="role">Root Canal Patient</div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Got my braces done at DentOra and the results are incredible! The doctor explained everything clearly and the treatment was very affordable. My smile has completely transformed in just 18 months."</blockquote>
+      <div class="author">Laishram Bikash</div>
+      <div class="role">Orthodontic Patient</div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Best dental clinic! Got my teeth whitening done here and the results were visible immediately. The DentOra whitening products they recommended for home use are also excellent. Worth every rupee!"</blockquote>
+      <div class="author">Ningthoujam Priya</div>
+      <div class="role">Cosmetic Dentistry Patient</div>
+    </div>
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"I brought my 5-year-old daughter here and the staff was so gentle and patient. She actually enjoyed her visit! The clinic environment is welcoming and child-friendly. Thank you DentOra team!"</blockquote>
+      <div class="author">Oinam Sanjita Devi</div>
+      <div class="role">Pediatric Patient's Parent</div>
+    </div>
+    <div class="testimonial-nav">
+      <button class="active"></button>
+      <button></button>
+      <button></button>
+      <button></button>
+    </div>
+  </div>
+</section>
+
+<!-- Appointment -->
+<section id="appointment">
+  <div class="section-header">
+    <div class="section-tag reveal">Book Appointment</div>
+    <h2 class="reveal">Schedule Your <span>Visit Today</span></h2>
+  </div>
+  <div class="appointment-container">
+    <div class="appointment-info reveal-left">
+      <h2>Let's Create Your <span>Perfect Smile</span></h2>
+      <p>Book your consultation today and take the first step toward a healthier, more beautiful smile. Our team is ready to provide personalized care tailored to your needs.</p>
+      <ul class="contact-list">
+        <li><span class="icon">📍</span> DentOra Dental Studio, Imphal, Manipur, India</li>
+        <li><span class="icon">📞</span> +91 98560 XXXXX</li>
+        <li><span class="icon">✉️</span> dentora.studio@gmail.com</li>
+        <li><span class="icon">🕐</span> Mon – Sat: 9:00 AM – 7:00 PM</li>
+        <li><span class="icon">📸</span> <a href="https://www.instagram.com/dentora_dental.studio" target="_blank" style="color:var(--accent);">@dentora_dental.studio</a></li>
+      </ul>
+    </div>
+    <form class="appointment-form reveal-right" id="appointment-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" name="name" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" placeholder="your@email.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone *</label>
+          <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" required>
+        </div>
+        <div class="form-group">
+          <label for="date">Preferred Date *</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+      </div>
+      <div class="form-group time-slot-container">
+        <label>Available Time Slots *</label>
+        <div class="time-slots" id="timeSlotsGrid">
+          <div class="time-slot free">09:00 AM</div>
+          <div class="time-slot booked">09:30 AM</div>
+          <div class="time-slot free">10:00 AM</div>
+          <div class="time-slot free">10:30 AM</div>
+          <div class="time-slot booked">11:00 AM</div>
+          <div class="time-slot free">11:30 AM</div>
+          <div class="time-slot free">02:00 PM</div>
+          <div class="time-slot booked">02:30 PM</div>
+          <div class="time-slot free">03:00 PM</div>
+          <div class="time-slot free">03:30 PM</div>
+          <div class="time-slot free">04:00 PM</div>
+          <div class="time-slot booked">04:30 PM</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="service">Select Service *</label>
+        <select id="service" name="service" required>
+          <option value="">Choose a service...</option>
+          <option>General Check-up & Consultation</option>
+          <option>Root Canal Treatment</option>
+          <option>Teeth Whitening</option>
+          <option>Orthodontic Braces / Aligners</option>
+          <option>Dental Implants</option>
+          <option>Smile Designing</option>
+          <option>Scaling & Cleaning</option>
+          <option>Oral Surgery</option>
+          <option>Pediatric Dentistry</option>
+          <option>Dentures & Crowns</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">Additional Notes</label>
+        <textarea id="message" name="message" rows="3" placeholder="Any special requirements or concerns..."></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Confirm Appointment →</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo"><img src="logo.jpg" alt="DentOra"><span>DentOra</span></div>
+      <p>A Multispeciality Dental Clinic by Dr. Priyakumari Laikhuram. Transforming smiles with advanced dental science and compassionate care since 2010.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#services">Our Services</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#doctors">Our Team</a></li>
+        <li><a href="#appointment">Book Appointment</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Treatments</h4>
+      <ul>
+        <li><a href="#services">Root Canal</a></li>
+        <li><a href="#services">Dental Implants</a></li>
+        <li><a href="#services">Braces & Aligners</a></li>
+        <li><a href="#services">Smile Designing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>DentOra Products</h4>
+      <ul>
+        <li><a href="#shop">Whitening Kits</a></li>
+        <li><a href="#shop">Electric Brushes</a></li>
+        <li><a href="#shop">Mouthwash</a></li>
+        <li><a href="https://www.instagram.com/dentora_dental.studio" target="_blank">Follow on Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 DentOra Dental Studio. All rights reserved.</span>
+    <div class="footer-social">
+      <a href="https://www.instagram.com/dentora_dental.studio" target="_blank" aria-label="Instagram">📷</a>
+      <a href="#" aria-label="Facebook">f</a>
+      <a href="#" aria-label="WhatsApp">💬</a>
+      <a href="tel:+919856000000" aria-label="Call">📞</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Shopify Cart -->
+<shopify-cart id="main-cart">
+  <div slot="checkout-button">Proceed to Checkout</div>
+  <div slot="empty">🦷 Your cart is empty</div>
+</shopify-cart>
+
+<div id="toast" class="toast"></div>
+
+<div class="success-overlay">
+  <div class="success-modal">
+    <div class="checkmark">✅</div>
+    <h3>Appointment Booked!</h3>
+    <p>Thank you for choosing DentOra. We'll confirm your appointment via call/WhatsApp shortly.</p>
+    <button class="btn-primary" id="success-close">Got it!</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

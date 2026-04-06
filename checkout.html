@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | DentOra Dental Clinic</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: var(--bg-dark);
+      color: var(--text-light);
+      padding: 40px 20px;
+    }
+    .checkout-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 40px;
+    }
+    @media (max-width: 768px) {
+      .checkout-container { grid-template-columns: 1fr; }
+    }
+    .checkout-section {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 30px;
+      border-radius: 20px;
+      border: 1px solid rgba(196, 168, 124, 0.1);
+    }
+    .checkout-section h2 {
+      margin-bottom: 25px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-family: inherit;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .price-summary {
+      position: sticky;
+      top: 40px;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    .summary-item.total {
+      border-top: 1px solid rgba(196, 168, 124, 0.3);
+      padding-top: 20px;
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    .cart-summary-items {
+      margin-bottom: 30px;
+    }
+    .cart-summary-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .cart-summary-item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .btn-complete {
+      width: 100%;
+      margin-top: 30px;
+      padding: 18px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .logo-header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .logo-header img { height: 60px; }
+  </style>
+</head>
+<body>
+
+  <div class="logo-header">
+    <a href="index.html"><img src="logo.jpg" alt="DentOra"></a>
+  </div>
+
+  <div class="checkout-container">
+    <!-- Billing Details -->
+    <div class="checkout-section">
+      <h2>Billing Information</h2>
+      <form id="checkout-form">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" required placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" required placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" required placeholder="john@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" required placeholder="+91 98XXX XXXXX">
+        </div>
+        <div class="form-group">
+          <label>Shipping Address</label>
+          <textarea rows="3" required placeholder="House No, Street, Landmark..."></textarea>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" required>
+          </div>
+          <div class="form-group">
+            <label>Pincode</label>
+            <input type="text" required>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Summary -->
+    <div class="checkout-section price-summary">
+      <h2>Order Summary</h2>
+      <div id="summary-list" class="cart-summary-items">
+        <!-- JS will populate this -->
+      </div>
+      
+      <div class="summary-item">
+        <span>Subtotal</span>
+        <span id="subtotal">₹0</span>
+      </div>
+      <div class="summary-item">
+        <span>Shipping</span>
+        <span style="color: #4CAF50;">FREE</span>
+      </div>
+      <div class="summary-item total">
+        <span>Total</span>
+        <span id="total">₹0</span>
+      </div>
+
+      <button type="submit" form="checkout-form" class="btn-primary btn-complete">Complete Purchase</button>
+      <p style="text-align: center; margin-top: 15px; font-size: 0.8rem; opacity: 0.6;">
+        🔒 Secure Checkout via Razorpay / Stripe
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const cartData = JSON.parse(localStorage.getItem('dentora_cart')) || { items: [], total: 0 };
+    const summaryList = document.getElementById('summary-list');
+    const subtotalEl = document.getElementById('subtotal');
+    const totalEl = document.getElementById('total');
+
+    if (cartData.items.length === 0) {
+      window.location.href = 'index.html';
+    }
+
+    summaryList.innerHTML = cartData.items.map(item => `
+      <div class="cart-summary-item">
+        <img src="${item.img}" alt="${item.name}">
+        <div style="flex: 1;">
+          <h4 style="margin:0; font-size: 1rem;">${item.name}</h4>
+          <span style="opacity: 0.7; font-size: 0.9rem;">Qty: ${item.qty}</span>
+        </div>
+        <span style="font-weight: 600;">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
+      </div>
+    `).join('');
+
+    subtotalEl.innerText = '₹' + cartData.total.toLocaleString('en-IN');
+    totalEl.innerText = '₹' + cartData.total.toLocaleString('en-IN');
+
+    document.getElementById('checkout-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Order Placed Successfully! In a real scenario, this would redirect to your payment gateway.');
+      localStorage.removeItem('dentora_cart');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
