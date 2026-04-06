@@ -11,7 +11,317 @@ window.addEventListener('load', () => {
 const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 'dentoraclinic.myshopify.com';
 const SHOPIFY_TOKEN = import.meta.env.VITE_SHOPIFY_PUBLIC_ACCESS_TOKEN || 'f41ed97311b7ca020be1dac2dc6a8bf9';
 
-// Shopify initialization removed: Handled synchronously in index.html for maximum reliability
+// ==================== SHOPIFY STOREFRONT API ====================
+const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/2024-01/graphql.json`;
+
+const PRODUCTS_QUERY = `{
+  products(first: 20) {
+    edges {
+      node {
+        id
+        title
+        handle
+        description
+        availableForSale
+        variants(first: 1) {
+          edges {
+            node {
+              id
+              price { amount currencyCode }
+              compareAtPrice { amount currencyCode }
+            }
+          }
+        }
+        images(first: 1) {
+          edges {
+            node { url altText }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+// Badge assignment for visual variety
+const BADGE_MAP = {
+  'prowhite-whitening-kit': 'Bestseller',
+  'sonicpro-electric-brush': 'New',
+  'water-flosser-oral-irrigator': 'Bestseller',
+  'premium-remineralizing-toothpaste': 'New',
+};
+
+// Fallback prices for products with incorrect Shopify data
+const PRICE_FALLBACK = {
+  'water-flosser-oral-irrigator': { price: '4900.00', compareAtPrice: null, minExpected: 1000 },
+};
+
+async function loadShopifyProducts() {
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+
+  try {
+    const response = await fetch(STOREFRONT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN,
+      },
+      body: JSON.stringify({ query: PRODUCTS_QUERY }),
+    });
+
+    const json = await response.json();
+    const products = json.data?.products?.edges?.map(e => e.node) || [];
+
+    if (products.length === 0) {
+      grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);grid-column:1/-1;">No products available at the moment.</p>';
+      return;
+    }
+
+    // Clear loading state
+    grid.innerHTML = '';
+
+    products.forEach((product, index) => {
+      const variant = product.variants.edges[0]?.node;
+      const image = product.images.edges[0]?.node;
+      const fallback = PRICE_FALLBACK[product.handle];
+      
+      // Use fallback price if Shopify returns incorrect data
+      let priceAmount = parseFloat(variant?.price?.amount || 0);
+      let compareAmount = parseFloat(variant?.compareAtPrice?.amount || 0);
+      
+      if (fallback && (priceAmount === 0 || (fallback.minExpected && priceAmount < fallback.minExpected))) {
+        priceAmount = parseFloat(fallback.price);
+        compareAmount = fallback.compareAtPrice ? parseFloat(fallback.compareAtPrice) : 0;
+      }
+      
+      const badge = BADGE_MAP[product.handle] || '';
+
+      const card = document.createElement('div');
+      card.className = 'product-card cinematic reveal';
+      card.style.transitionDelay = `${(index % 4) * 0.15}s`;
+
+      const formattedPrice = priceAmount > 0 ? `₹${priceAmount.toLocaleString('en-IN')}` : '';
+      const formattedCompare = compareAmount > 0 
+        ? `₹${compareAmount.toLocaleString('en-IN')}` 
+        : '';
+
+      card.innerHTML = `
+        ${badge ? `<div class="product-badge">${badge}</div>` : ''}
+        <div class="product-img">
+          ${image ? `<img src="${image.url}" alt="${image.altText || product.title}" loading="lazy">` : ''}
+        </div>
+        <div class="product-info">
+          <div class="brand">DENTORA</div>
+          <h3>${product.title}</h3>
+          <p>${product.description || ''}</p>
+          <div class="product-bottom">
+            <div class="product-price">
+              ${formattedPrice}
+              ${formattedCompare ? `<span class="old">${formattedCompare}</span>` : ''}
+            </div>
+            <button class="btn-cart" data-variant-id="${variant?.id || ''}" onclick="addToCart(this)">Add to Cart</button>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    // Re-observe new elements for scroll reveal
+    const newRevealElements = grid.querySelectorAll('.reveal');
+    newRevealElements.forEach(el => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, idx) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), idx * 100);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      observer.observe(el);
+    });
+
+  } catch (error) {
+    console.error('Failed to load products:', error);
+    grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);grid-column:1/-1;">Unable to load products. Please try again later.</p>';
+  }
+}
+
+// ==================== ADD TO CART (Storefront API) ====================
+// Simple cart stored in localStorage as fallback
+let shopifyCartId = localStorage.getItem('dentora_shopify_cart_id') || null;
+
+async function addToCart(button) {
+  const variantId = button.getAttribute('data-variant-id');
+  if (!variantId) {
+    showToast('Unable to add — product not available.');
+    return;
+  }
+
+  button.textContent = 'Adding...';
+  button.disabled = true;
+
+  try {
+    if (!shopifyCartId) {
+      // Create a new cart
+      const createRes = await fetch(STOREFRONT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN,
+        },
+        body: JSON.stringify({
+          query: `mutation cartCreate($input: CartInput!) {
+            cartCreate(input: $input) {
+              cart { id checkoutUrl totalQuantity }
+              userErrors { field message }
+            }
+          }`,
+          variables: {
+            input: {
+              lines: [{ merchandiseId: variantId, quantity: 1 }]
+            }
+          }
+        }),
+      });
+      const createJson = await createRes.json();
+      const cart = createJson.data?.cartCreate?.cart;
+      if (cart) {
+        shopifyCartId = cart.id;
+        localStorage.setItem('dentora_shopify_cart_id', shopifyCartId);
+        localStorage.setItem('dentora_checkout_url', cart.checkoutUrl);
+        updateCartCount(cart.totalQuantity);
+        showToast('Added to cart! 🛒');
+      }
+    } else {
+      // Add to existing cart
+      const addRes = await fetch(STOREFRONT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN,
+        },
+        body: JSON.stringify({
+          query: `mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+            cartLinesAdd(cartId: $cartId, lines: $lines) {
+              cart { id checkoutUrl totalQuantity }
+              userErrors { field message }
+            }
+          }`,
+          variables: {
+            cartId: shopifyCartId,
+            lines: [{ merchandiseId: variantId, quantity: 1 }]
+          }
+        }),
+      });
+      const addJson = await addRes.json();
+      const cart = addJson.data?.cartLinesAdd?.cart;
+      if (cart) {
+        localStorage.setItem('dentora_checkout_url', cart.checkoutUrl);
+        updateCartCount(cart.totalQuantity);
+        showToast('Added to cart! 🛒');
+      } else {
+        // Cart may have expired, reset and retry
+        shopifyCartId = null;
+        localStorage.removeItem('dentora_shopify_cart_id');
+        addToCart(button);
+        return;
+      }
+    }
+  } catch (err) {
+    console.error('Add to cart error:', err);
+    showToast('Failed to add. Please try again.');
+  }
+
+  button.textContent = 'Add to Cart';
+  button.disabled = false;
+}
+
+function updateCartCount(qty) {
+  const cartCountEl = document.getElementById('cart-count');
+  if (cartCountEl) {
+    cartCountEl.textContent = qty;
+    cartCountEl.classList.add('pulse');
+    setTimeout(() => cartCountEl.classList.remove('pulse'), 500);
+  }
+}
+
+// Load products on page ready
+loadShopifyProducts();
+// Expose addToCart globally for inline onclick handlers
+window.addToCart = addToCart;
+
+// ==================== CUSTOM MODAL CART ====================
+window.openCart = async function() {
+  const modal = document.getElementById('main-cart');
+  const cartContent = document.getElementById('cart-content');
+  if (modal) modal.showModal();
+
+  if (!shopifyCartId) {
+    if (cartContent) cartContent.innerHTML = `<div class="empty-state">🦷 Your cart is empty</div>`;
+    return;
+  }
+
+  if (cartContent) cartContent.innerHTML = `<div style="text-align:center; padding: 40px 0;"><h3 style="color:var(--accent);">Loading Cart...</h3></div>`;
+
+  try {
+    const res = await fetch(STOREFRONT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN,
+      },
+      body: JSON.stringify({
+        query: `query { 
+          cart(id: "${shopifyCartId}") { 
+            checkoutUrl 
+            cost { totalAmount { amount currencyCode } }
+            lines(first: 10) { 
+              edges { node { 
+                quantity 
+                merchandise { ... on ProductVariant { title product { title } image { url } price { amount currencyCode } } } 
+              } }
+            }
+          } 
+        }`
+      }),
+    });
+    const json = await res.json();
+    const cart = json.data?.cart;
+
+    if (!cart || !cart.lines.edges.length) {
+      cartContent.innerHTML = `<div class="empty-state">🦷 Your cart is empty</div>`;
+      return;
+    }
+
+    let html = '';
+    cart.lines.edges.forEach(edge => {
+       const line = edge.node;
+       const p = line.merchandise.product;
+       const img = line.merchandise.image?.url;
+       html += `
+         <div class="cart-line">
+           ${img ? `<img src="${img}" alt="${p.title}">` : '<div class="no-img" style="width:70px;height:70px;background:#333;"></div>'}
+           <div class="cart-line-info">
+             <h4>${p.title}</h4>
+             <span class="qty">Qty: ${line.quantity}</span>
+           </div>
+           <div class="cart-line-price">₹${parseFloat(line.merchandise.price.amount).toLocaleString('en-IN')}</div>
+         </div>
+       `;
+    });
+    
+    html += `
+      <div class="cart-total">
+        <span>Total</span>
+        <span>₹${parseFloat(cart.cost.totalAmount.amount).toLocaleString('en-IN')}</span>
+      </div>
+      <a href="${cart.checkoutUrl}" target="_blank" class="cart-checkout-btn">Proceed to Checkout</a>
+    `;
+    cartContent.innerHTML = html;
+  } catch(e) {
+    if (cartContent) cartContent.innerHTML = `<div class="empty-state">Unable to load cart.</div>`;
+  }
+}
 
 // ==================== CUSTOM CURSOR ====================
 const cursorDot = document.querySelector('.cursor-dot');
@@ -361,42 +671,63 @@ function init3D() {
   modelGroup.add(toothGroup);
 
   // --- 2. THE CHROME CRADLE (Image 2 Replica) ---
-  // Thick, wide architectural U-shape
-  const cradleGeo = new THREE.TorusGeometry(2.1, 0.5, 24, 100, Math.PI); 
-  const cradle = new THREE.Mesh(cradleGeo, chromeMat);
-  cradle.scale.set(1.5, 0.8, 1);
-  cradle.rotation.x = Math.PI / 2.1;
-  cradle.position.y = -0.3;
-  modelGroup.add(cradle);
+  const cradleGroup = new THREE.Group();
+  
+  // Majestic outer arch
+  const outerGeo = new THREE.TorusGeometry(3.2, 0.45, 32, 100, Math.PI * 1.25);
+  const outer = new THREE.Mesh(outerGeo, chromeMat);
+  outer.rotation.x = Math.PI / 1.7;
+  outer.rotation.y = 0.2;
+  cradleGroup.add(outer);
 
-  // --- 3. DENTAL INSTRUMENTS (Professional Crossing) ---
+  // Structural inner arch (the dual bar look)
+  const innerGeo = new THREE.TorusGeometry(2.3, 0.3, 32, 100, Math.PI * 1.35);
+  const inner = new THREE.Mesh(innerGeo, chromeMat);
+  inner.rotation.x = Math.PI / 1.5;
+  inner.rotation.y = 0.1;
+  inner.position.y = -0.5;
+  inner.position.z = 0.5;
+  cradleGroup.add(inner);
+  
+  cradleGroup.position.set(0, 0.8, -1.0);
+  modelGroup.add(cradleGroup);
+
+  // --- 3. DENTAL INSTRUMENTS (Crossing in Front) ---
+  const handleGeo = new THREE.CylinderGeometry(0.08, 0.1, 8.5, 12);
+  
+  // Professional Mirror
   const mirrorGroup = new THREE.Group();
-  const handleGeo = new THREE.CylinderGeometry(0.08, 0.08, 5.5, 12);
-  const handle = new THREE.Mesh(handleGeo, chromeMat);
-  mirrorGroup.add(handle);
+  const mirrorHandle = new THREE.Mesh(handleGeo, chromeMat);
+  mirrorGroup.add(mirrorHandle);
 
   const headGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.08, 32);
   const head = new THREE.Mesh(headGeo, chromeMat);
-  head.position.y = 2.7;
-  head.rotation.x = Math.PI / 3.5;
+  head.position.y = 4.3;
+  head.rotation.x = Math.PI / 3;
   mirrorGroup.add(head);
   
-  mirrorGroup.position.set(2.4, 1.2, -1);
+  // Position passing from back-left across the front
+  mirrorGroup.position.set(0.5, 0.5, 2.5);
   mirrorGroup.rotation.z = -Math.PI / 3.5;
+  mirrorGroup.rotation.x = -Math.PI / 8;
   modelGroup.add(mirrorGroup);
 
+  // Dental Probe (Sickle Scaler)
   const probeGroup = new THREE.Group();
   const probeHandle = new THREE.Mesh(handleGeo, chromeMat);
   probeGroup.add(probeHandle);
   
-  const hookGeo = new THREE.TorusGeometry(0.35, 0.06, 8, 24, Math.PI);
+  const hookGeo = new THREE.TorusGeometry(0.35, 0.06, 8, 24, Math.PI * 1.5);
   const hook = new THREE.Mesh(hookGeo, chromeMat);
-  hook.position.y = 2.7;
-  hook.rotation.z = Math.PI / 1.5;
+  hook.position.y = 4.3;
+  hook.position.x = -0.2;
+  hook.rotation.z = Math.PI / 1.2;
   probeGroup.add(hook);
 
-  probeGroup.position.set(-2.4, 1.2, -1);
-  probeGroup.rotation.z = Math.PI / 3.5;
+  // Position passing from back-right crossing behind mirror
+  probeGroup.position.set(-1.0, 0.8, 1.5);
+  probeGroup.rotation.z = Math.PI / 4.5;
+  probeGroup.rotation.x = 0;
   modelGroup.add(probeGroup);
 
   // --- LIGHTING ---
