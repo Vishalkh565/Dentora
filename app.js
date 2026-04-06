@@ -50,10 +50,7 @@ const BADGE_MAP = {
   'premium-remineralizing-toothpaste': 'New',
 };
 
-// Fallback prices for products with incorrect Shopify data
-const PRICE_FALLBACK = {
-  'water-flosser-oral-irrigator': { price: '4900.00', compareAtPrice: null, minExpected: 1000 },
-};
+// Fallback prices for products with incorrect Shopify data (REMOVED: To ensure Storefront sync with Cart)
 
 async function loadShopifyProducts() {
   const grid = document.getElementById('products-grid');
@@ -83,16 +80,10 @@ async function loadShopifyProducts() {
     products.forEach((product, index) => {
       const variant = product.variants.edges[0]?.node;
       const image = product.images.edges[0]?.node;
-      const fallback = PRICE_FALLBACK[product.handle];
       
-      // Use fallback price if Shopify returns incorrect data
+      // Use true Shopify server-side pricing to ensure sync with Cart
       let priceAmount = parseFloat(variant?.price?.amount || 0);
       let compareAmount = parseFloat(variant?.compareAtPrice?.amount || 0);
-      
-      if (fallback && (priceAmount === 0 || (fallback.minExpected && priceAmount < fallback.minExpected))) {
-        priceAmount = parseFloat(fallback.price);
-        compareAmount = fallback.compareAtPrice ? parseFloat(fallback.compareAtPrice) : 0;
-      }
       
       const badge = BADGE_MAP[product.handle] || '';
 
