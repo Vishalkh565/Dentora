@@ -6,6 +6,29 @@ window.addEventListener('load', () => {
   }, 1200);
 });
 
+// ==================== CONFIGURATION ====================
+// Injected via Vite environment variables
+const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 'dentoraclinic.myshopify.com';
+const SHOPIFY_TOKEN = import.meta.env.VITE_SHOPIFY_PUBLIC_ACCESS_TOKEN || 'f41ed97311b7ca020be1dac2dc6a8bf9';
+
+function initShopify() {
+  const container = document.getElementById('shopify-store-container');
+  if (container) {
+    // Create the store element dynamically
+    const storeEl = document.createElement('shopify-store');
+    storeEl.id = 'main-store';
+    storeEl.setAttribute('store-domain', SHOPIFY_DOMAIN);
+    storeEl.setAttribute('public-access-token', SHOPIFY_TOKEN);
+    storeEl.setAttribute('country', 'IN');
+    storeEl.setAttribute('language', 'en');
+    
+    // Append to DOM - this triggers connectedCallback with attributes already set
+    container.appendChild(storeEl);
+    console.log('[SHOPIFY] Dynamic Store Injected:', SHOPIFY_DOMAIN);
+  }
+}
+initShopify();
+
 // ==================== CUSTOM CURSOR ====================
 const cursorDot = document.querySelector('.cursor-dot');
 const cursorRing = document.querySelector('.cursor-ring');
@@ -259,69 +282,95 @@ function initFan() {
 window.addEventListener('load', initFan);
 window.addEventListener('resize', initFan);
 
-// ==================== 3D TOOTH (Three.js) ====================
+// ==================== 3D TOOTH & HOLDER (Three.js) ====================
 function init3D() {
   const canvas = document.getElementById('three-canvas');
   if (!canvas || !window.THREE) return;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  camera.position.z = 5;
+  camera.position.z = 6;
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const geometry = new THREE.IcosahedronGeometry(1.6, 16);
-  const positionAttribute = geometry.attributes.position;
-  const vertex = new THREE.Vector3();
-  const vData = [];
-  for (let i = 0; i < positionAttribute.count; i++) {
-    vertex.fromBufferAttribute(positionAttribute, i);
-    vData.push(vertex.clone());
-  }
+  const modelGroup = new THREE.Group();
+  scene.add(modelGroup);
 
-  const material = new THREE.MeshPhysicalMaterial({
-    color: 0x8B6F4E,
-    metalness: 0.6,
-    roughness: 0.1,
-    transparent: true,
-    opacity: 0.9,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.1,
-    emissive: 0x3D2E1E,
-    emissiveIntensity: 0.2,
-    reflectivity: 1,
-    transmission: 0.2
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  // --- 1. THE TOOTH (Realistic Molar) ---
+  const toothGroup = new THREE.Group();
   
-  const wireGeo = new THREE.IcosahedronGeometry(2.0, 1);
-  const wireMat = new THREE.MeshBasicMaterial({ color: 0xC4A87C, wireframe: true, transparent: true, opacity: 0.15 });
-  const wireMesh = new THREE.Mesh(wireGeo, wireMat);
-  scene.add(wireMesh);
+  // Crown
+  const crownGeo = new THREE.BoxGeometry(1.6, 1.4, 1.5, 2, 2, 2);
+  const enamelMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    roughness: 0.1,
+    metalness: 0.0,
+    clearcoat: 1.0,
+    reflectivity: 1.0,
+    transmission: 0.05
+  });
+  const crown = new THREE.Mesh(crownGeo, enamelMat);
+  crown.scale.set(1.1, 1, 1.05);
+  toothGroup.add(crown);
 
-  const sphereGroup = new THREE.Group();
-  for (let i = 0; i < 60; i++) {
-    const sg = new THREE.SphereGeometry(0.03, 8, 8);
-    const sm = new THREE.MeshBasicMaterial({ color: 0xC4A87C, transparent: true, opacity: 0.3 });
-    const sphere = new THREE.Mesh(sg, sm);
-    sphere.position.set((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4);
-    sphere.userData = { speed: 0.002 + Math.random() * 0.005, offset: Math.random() * Math.PI * 2 };
-    sphereGroup.add(sphere);
-  }
-  scene.add(sphereGroup);
+  // Roots (2 simplified roots)
+  const rootGeo = new THREE.CylinderGeometry(0.35, 0.05, 0.8, 8);
+  const root1 = new THREE.Mesh(rootGeo, enamelMat);
+  root1.position.set(0.4, -0.9, 0);
+  root1.rotation.z = 0.3;
+  toothGroup.add(root1);
+  
+  const root2 = new THREE.Mesh(rootGeo, enamelMat);
+  root2.position.set(-0.4, -0.9, 0);
+  root2.rotation.z = -0.3;
+  toothGroup.add(root2);
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  toothGroup.position.y = 0.5;
+  modelGroup.add(toothGroup);
+
+  // --- 2. THE DENTAL MIRROR (Chrome Instrument) ---
+  const mirrorGroup = new THREE.Group();
+  
+  // Mirror Disc
+  const discGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.1, 32);
+  const chromeMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 1.0,
+    roughness: 0.02
+  });
+  const disc = new THREE.Mesh(discGeo, chromeMat);
+  disc.rotation.x = Math.PI / 4;
+  mirrorGroup.add(disc);
+
+  // Handle
+  const handleGeo = new THREE.CylinderGeometry(0.12, 0.12, 4, 16);
+  const handle = new THREE.Mesh(handleGeo, chromeMat);
+  handle.position.set(0, -2, -0.8);
+  handle.rotation.x = Math.PI / 8;
+  mirrorGroup.add(handle);
+
+  mirrorGroup.position.y = -1.2;
+  modelGroup.add(mirrorGroup);
+
+  // --- 3. LIGHTING (Clinical Studio) ---
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
   scene.add(ambientLight);
-  const pointLight = new THREE.PointLight(0xC4A87C, 2, 20);
-  pointLight.position.set(3, 3, 5);
-  scene.add(pointLight);
-  const pointLight2 = new THREE.PointLight(0xA68B6B, 1.5, 20);
-  pointLight2.position.set(-3, -2, 3);
-  scene.add(pointLight2);
 
+  const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  mainLight.position.set(5, 10, 5);
+  scene.add(mainLight);
+
+  const rimLight = new THREE.PointLight(0x00f2ff, 1.0, 20); // Cyan rim highlight
+  rimLight.position.set(-5, -3, 2);
+  scene.add(rimLight);
+
+  const topLight = new THREE.PointLight(0xffffff, 1.2, 20);
+  topLight.position.set(0, 5, 0);
+  scene.add(topLight);
+
+  // --- 4. ANIMATION & INTERACTION ---
   let mouseX = 0, mouseY = 0;
   document.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -332,31 +381,14 @@ function init3D() {
     requestAnimationFrame(animate);
     const time = Date.now() * 0.001;
 
-    const k = 1.2;
-    for (let i = 0; i < positionAttribute.count; i++) {
-        const v = vData[i];
-        vertex.copy(v);
-        const noise = Math.sin(v.x * k + time) * Math.cos(v.y * k + time) * Math.sin(v.z * k + time);
-        vertex.add(v.clone().normalize().multiplyScalar(noise * 0.4));
-        positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
-    }
-    positionAttribute.needsUpdate = true;
-    geometry.computeVertexNormals();
-
-    mesh.rotation.y += 0.002;
-    mesh.rotation.x += (mouseY * 0.3 - mesh.rotation.x) * 0.02;
-    mesh.rotation.y += (mouseX * 0.3 - mesh.rotation.y) * 0.02;
+    // Gentle float
+    modelGroup.position.y = Math.sin(time * 0.8) * 0.1;
     
-    wireMesh.rotation.y -= 0.001;
-    wireMesh.rotation.x += 0.001;
-    wireMesh.position.y = Math.sin(time * 0.5) * 0.15;
-    mesh.position.y = wireMesh.position.y;
-
-    sphereGroup.children.forEach(s => {
-      s.position.y += Math.sin(time + s.userData.offset) * s.userData.speed;
-      s.position.x += Math.cos(time * 0.5 + s.userData.offset) * s.userData.speed * 0.5;
-    });
-
+    // Smooth interaction rotation
+    modelGroup.rotation.y += 0.005; // Constant slow spin
+    modelGroup.rotation.x += (mouseY * 0.2 - modelGroup.rotation.x) * 0.05;
+    modelGroup.rotation.y += (mouseX * 0.2 - modelGroup.rotation.y) * 0.05;
+    
     renderer.render(scene, camera);
   }
   animate();
