@@ -620,7 +620,7 @@ footer { background:var(--bg-dark-brown); border-top:1px solid rgba(255,255,255,
 .cart-total { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(196,168,124,0.2); font-size: 1.2rem; font-weight: 600; }
 
 .cart-checkout-btn, .custom-cart button.cart-checkout-btn {
-  background: var(--btn-gradient);
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
   color: #1a120b;
   border: none;
   font-family: 'Outfit', sans-serif;

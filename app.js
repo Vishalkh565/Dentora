@@ -337,12 +337,22 @@ window.openCart = async function() {
        `;
     });
     
+    // Check if there are any active discounts
+    const discountAllocations = cart.discountCodes || [];
+    let discountHTML = '';
+    
     html += `
-      <div class="cart-total">
+      <div class="cart-discount">
+        <div style="display:flex;gap:10px;margin-bottom:15px;margin-top:auto;border-top:1px solid rgba(196,168,124,0.2);padding-top:20px;">
+          <input type="text" id="discount-input" placeholder="Gift card or discount code" style="flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:4px;outline:none;font-family:'Inter',sans-serif;">
+          <button onclick="applyDiscountCode(this)" style="padding:12px 20px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px;cursor:pointer;font-weight:600;transition:0.2s;">Apply</button>
+        </div>
+      </div>
+      <div class="cart-total" style="border-top:none;padding-top:0;">
         <span>Total</span>
         <span>₹${parseFloat(cart.cost.totalAmount.amount).toLocaleString('en-IN')}</span>
       </div>
-      <a href="${cart.checkoutUrl}" target="_blank" class="cart-checkout-btn">Proceed to Checkout</a>
+      <a href="${cart.checkoutUrl}" target="_blank" class="cart-checkout-btn">PROCEED TO CHECKOUT</a>
     `;
     cartContent.innerHTML = html;
   } catch(e) {
@@ -376,6 +386,48 @@ window.removeCartItem = async function(lineId, btn) {
   } catch(e) {
     console.error('Failed to remove item', e);
     btn.textContent = 'Remove';
+    btn.disabled = false;
+  }
+}
+
+window.applyDiscountCode = async function(btn) {
+  const codeInput = document.getElementById('discount-input');
+  const code = codeInput ? codeInput.value.trim() : '';
+  if (!code) return;
+  
+  const originalText = btn.textContent;
+  btn.textContent = '...';
+  btn.disabled = true;
+  
+  try {
+    const res = await fetch(STOREFRONT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': SHOPIFY_TOKEN },
+      body: JSON.stringify({
+        query: `mutation cartDiscountCodesUpdate($cartId: ID!, $discountCodes: [String!]) {
+          cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
+            cart { id }
+            userErrors { field message }
+          }
+        }`,
+        variables: { cartId: shopifyCartId, discountCodes: [code] }
+      })
+    });
+    
+    const json = await res.json();
+    const errors = json.data?.cartDiscountCodesUpdate?.userErrors;
+    
+    if (errors && errors.length > 0) {
+      alert(errors[0].message);
+      btn.textContent = originalText;
+      btn.disabled = false;
+    } else {
+      // Reload cart to show updated total and applied discounts
+      openCart();
+    }
+  } catch(e) {
+    console.error('Failed to apply discount', e);
+    btn.textContent = originalText;
     btn.disabled = false;
   }
 }
