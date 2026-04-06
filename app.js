@@ -795,16 +795,22 @@ function init3D() {
 
     // Smooth Responsive Re-Positioning
     const isMobile = window.innerWidth <= 768;
-    const targetX = isMobile ? 0 : 2.2;
-    const targetY = isMobile ? 1.5 : 0;
-    const targetZ = isMobile ? -2.0 : 1.0;
+    const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+    
+    // Scale down drastically for smaller mobile heights to avoid clipping
+    let targetX = 2.2, targetY = 0, targetZ = 1.0, baseScale = 1.0;
+    
+    if (isMobile) {
+      targetX = 0; targetY = 0; targetZ = -4.0; baseScale = 0.4;
+    } else if (isTablet) {
+      targetX = 0; targetY = 0; targetZ = -2.0; baseScale = 0.7;
+    }
 
     blobGroup.position.x += (targetX - blobGroup.position.x) * 0.05;
     blobGroup.position.y += ((targetY + Math.sin(time * 0.8) * 0.1) - blobGroup.position.y) * 0.05;
     blobGroup.position.z += (targetZ - blobGroup.position.z) * 0.05;
 
     // Organic scaling pulse
-    const baseScale = isMobile ? 0.75 : 1.0;
     const pulse = Math.sin(time * 1.5) * 0.02;
     blobGroup.scale.set(
       (1.2 + pulse) * baseScale, 
