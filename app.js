@@ -691,112 +691,58 @@ function init3D() {
   scene.add(modelGroup);
 
   // --- MATERIALS ---
-  const porcelainMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    roughness: 0.1,
-    metalness: 0.0,
-    clearcoat: 1.0,
-    reflectivity: 1.0,
-    transmission: 0, // Opaque Porcelain
+  const blobMat = new THREE.MeshStandardMaterial({
+    color: 0x332211, // Dark organic bronze
+    roughness: 0.3,
+    metalness: 0.2,
+    flatShading: true, // Creates the distinct angular facets seen in the reflections
   });
 
-  const chromeMat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    metalness: 1.0,
-    roughness: 0.02
+  const wireMat = new THREE.MeshBasicMaterial({
+    color: 0xc4a87c,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.15
   });
 
-  // --- 1. THE TOOTH (High Fidelity) ---
-  const toothGroup = new THREE.Group();
+  // --- 1. THE ABSTRACT ORGANIC BLOB (Foreground) ---
+  const blobGroup = new THREE.Group();
   
-  const crownGeo = new THREE.SphereGeometry(1.1, 32, 24);
-  const crown = new THREE.Mesh(crownGeo, porcelainMat);
-  crown.scale.set(1, 1.15, 0.95);
-  toothGroup.add(crown);
+  const blobGeo = new THREE.IcosahedronGeometry(2.5, 2);
+  const posAttribute = blobGeo.attributes.position;
+  // Randomly displace vertices to make it organic and irregular
+  for (let i = 0; i < posAttribute.count; i++) {
+    const v = new THREE.Vector3().fromBufferAttribute(posAttribute, i);
+    v.normalize().multiplyScalar(2.0 + Math.random() * 0.8);
+    posAttribute.setXYZ(i, v.x, v.y, v.z);
+  }
+  blobGeo.computeVertexNormals();
 
-  const rootGeo = new THREE.CylinderGeometry(0.4, 0.1, 1.3, 16);
-  const root1 = new THREE.Mesh(rootGeo, porcelainMat);
-  root1.position.set(0.35, -1.1, 0);
-  root1.rotation.z = 0.25;
-  toothGroup.add(root1);
-
-  const root2 = new THREE.Mesh(rootGeo, porcelainMat);
-  root2.position.set(-0.35, -1.1, 0);
-  root2.rotation.z = -0.25;
-  toothGroup.add(root2);
-
-  modelGroup.add(toothGroup);
-
-  // --- 2. THE CHROME CRADLE (Image 2 Replica) ---
-  const cradleGroup = new THREE.Group();
+  const blobMesh = new THREE.Mesh(blobGeo, blobMat);
+  blobGroup.add(blobMesh);
   
-  // Majestic outer arch
-  const outerGeo = new THREE.TorusGeometry(3.2, 0.45, 32, 100, Math.PI * 1.25);
-  const outer = new THREE.Mesh(outerGeo, chromeMat);
-  outer.rotation.x = Math.PI / 1.7;
-  outer.rotation.y = 0.2;
-  cradleGroup.add(outer);
+  blobGroup.position.set(2.0, 0, 1.0); // Positioned prominently on the right
+  modelGroup.add(blobGroup);
 
-  // Structural inner arch (the dual bar look)
-  const innerGeo = new THREE.TorusGeometry(2.3, 0.3, 32, 100, Math.PI * 1.35);
-  const inner = new THREE.Mesh(innerGeo, chromeMat);
-  inner.rotation.x = Math.PI / 1.5;
-  inner.rotation.y = 0.1;
-  inner.position.y = -0.5;
-  inner.position.z = 0.5;
-  cradleGroup.add(inner);
+  // --- 2. THE BACKGROUND WIREFRAME ---
+  // Large background constellation/wireframe effect
+  const wireGeo = new THREE.IcosahedronGeometry(4.0, 1);
+  const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+  wireMesh.position.set(-1.0, 0, -3.0);
+  modelGroup.add(wireMesh);
+
+  // --- LIGHTING (Crucial for the golden diamond reflections) ---
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
   
-  cradleGroup.position.set(0, 0.8, -1.0);
-  modelGroup.add(cradleGroup);
+  // Golden light that reflects off the flat facets
+  const goldLight1 = new THREE.PointLight(0xffaa44, 3.0, 50);
+  goldLight1.position.set(3, 3, 5);
+  scene.add(goldLight1);
 
-  // --- 3. DENTAL INSTRUMENTS (Crossing in Front) ---
-  const handleGeo = new THREE.CylinderGeometry(0.08, 0.1, 8.5, 12);
-  
-  // Professional Mirror
-  const mirrorGroup = new THREE.Group();
-  const mirrorHandle = new THREE.Mesh(handleGeo, chromeMat);
-  mirrorGroup.add(mirrorHandle);
-
-  const headGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.08, 32);
-  const head = new THREE.Mesh(headGeo, chromeMat);
-  head.position.y = 4.3;
-  head.rotation.x = Math.PI / 3;
-  mirrorGroup.add(head);
-  
-  // Position passing from back-left across the front
-  mirrorGroup.position.set(0.5, 0.5, 2.5);
-  mirrorGroup.rotation.z = -Math.PI / 3.5;
-  mirrorGroup.rotation.x = -Math.PI / 8;
-  modelGroup.add(mirrorGroup);
-
-  // Dental Probe (Sickle Scaler)
-  const probeGroup = new THREE.Group();
-  const probeHandle = new THREE.Mesh(handleGeo, chromeMat);
-  probeGroup.add(probeHandle);
-  
-  const hookGeo = new THREE.TorusGeometry(0.35, 0.06, 8, 24, Math.PI * 1.5);
-  const hook = new THREE.Mesh(hookGeo, chromeMat);
-  hook.position.y = 4.3;
-  hook.position.x = -0.2;
-  hook.rotation.z = Math.PI / 1.2;
-  probeGroup.add(hook);
-
-  // Position passing from back-right crossing behind mirror
-  probeGroup.position.set(-1.0, 0.8, 1.5);
-  probeGroup.rotation.z = Math.PI / 4.5;
-  probeGroup.rotation.x = 0;
-  modelGroup.add(probeGroup);
-
-  // --- LIGHTING ---
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-  
-  const light1 = new THREE.DirectionalLight(0xffffff, 1.8);
-  light1.position.set(5, 15, 10);
-  scene.add(light1);
-
-  const light2 = new THREE.PointLight(0x00f2ff, 1.0);
-  light2.position.set(-8, -5, 5);
-  scene.add(light2);
+  // Secondary bright light
+  const goldLight2 = new THREE.PointLight(0xffeeaa, 1.5, 50);
+  goldLight2.position.set(-2, -5, 4);
+  scene.add(goldLight2);
 
   // --- ANIMATION ---
   let mouseX = 0, mouseY = 0;
@@ -810,9 +756,15 @@ function init3D() {
     const time = Date.now() * 0.001;
 
     modelGroup.position.y = Math.sin(time * 0.8) * 0.1;
-    
-    const scale = 1 + Math.sin(time * 1.5) * 0.01;
-    toothGroup.scale.set(scale, scale, scale);
+
+    // Organic scaling pulse
+    const blobScale = 1 + Math.sin(time * 1.5) * 0.02;
+    blobGroup.scale.set(blobScale, blobScale, blobScale);
+
+    blobGroup.rotation.x += 0.001;
+    blobGroup.rotation.y -= 0.002;
+    wireMesh.rotation.y += 0.001;
+    wireMesh.rotation.z -= 0.001;
 
     modelGroup.rotation.y += 0.002;
     modelGroup.rotation.x += (mouseY * 0.12 - modelGroup.rotation.x) * 0.05;
